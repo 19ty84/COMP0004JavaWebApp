@@ -39,14 +39,26 @@ public class Model {
         if (keyword.length() == 0)
             return List.of("Search keyword is empty. Please enter at least 1 character.");
 
+        String[] words = keyword.split("\\s");
         ArrayList<String> searchResult = new ArrayList<String>();
         for (int row = 0; row < dataFrame.getRowCount(); row++) {
-            for (int col = 0; col < dataFrame.getColumnCount(); col++) {
-                String columnName = dataFrame.getColumnNames().get(col);
-                if (dataFrame.getValue(columnName, row).contains(keyword)) {
-                    searchResult.add(getPatientSummaryFromRowIndex(row));
-                    break; // Search next row
+            boolean keywordMatch = true;
+            for (String word : words) {
+                boolean wordFound = false;
+                for (int col = 0; col < dataFrame.getColumnCount(); col++) {
+                    String columnName = dataFrame.getColumnNames().get(col);
+                    if (dataFrame.getValue(columnName, row).toLowerCase().contains(word.toLowerCase())) {
+                        wordFound = true;
+                        break;
+                    }
                 }
+                if (!wordFound) {
+                    keywordMatch = false;
+                    break;
+                }
+            }
+            if (keywordMatch) {
+                searchResult.add(getPatientSummaryFromRowIndex(row));
             }
         }
         return searchResult;
