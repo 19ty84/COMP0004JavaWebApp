@@ -1,4 +1,5 @@
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html>
@@ -18,22 +19,40 @@
       <p style="color: red;"><%= errorMessage %></p>
   <%
     }
-    List<String> patients = (List<String>) request.getAttribute("result");
+    List<Map<String, String>> patients = (List<Map<String, String>>) request.getAttribute("result");
     if (patients != null && patients.size() != 0)
-    {
-    %>
-    <ul>
-      <%
-        for (String patient : patients)
+    { %>
+      <table border="1">
+      <tr>
+        <% List<String> columnNames = (List<String>) request.getAttribute("columnNames");
+        for (String columnName : columnNames)
         {
-      %>
-      <li><%=patient%></li>
-     <% }
+        %>
+          <td><%= columnName %></td>
+        <% } %>
+      </tr>
+      <% for (Map<String, String> patient : patients) {
+        String patientID = patient.get("ID");
+        String href = "patientInfo.jsp" + "?id=" + patientID;
+  %>
+        <tr>
+          <% for (String columnName : columnNames)
+          {
+            if (columnName.equals("ID")){
+            %>
+              <td><a href=<%= href %>><%= patient.get("ID") %></a></td>
+            <% } else {
+            %>
+              <td><%= patient.get(columnName) %></td>
+          <% } } %>
+        </tr>
+      <% } %>
+        </table>
+      <%
     } else if (errorMessage == null)
-    {%>
+    { %>
       <p>Nothing found</p>
-  <%}%>
-  </ul>
+  <% } %>
 </div>
 <jsp:include page="/footer.jsp"/>
 </body>

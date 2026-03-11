@@ -2,51 +2,69 @@ package uk.ac.ucl.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Model {
     private DataLoader dataLoader;
     private DataFrame dataFrame;
-    private ArrayList<String> patientSummaries;
+    private ArrayList<String> columnNames;
+    private ArrayList<Map<String, String>> patientInfos;
 
     public Model() {
         dataLoader = new DataLoader();
         dataFrame = null;
-        patientSummaries = new ArrayList<String>();
-    }
-
-    public List<String> getPatientSummaries() {
-        return patientSummaries;
+        columnNames = new ArrayList<String>();
+        patientInfos = new ArrayList<Map<String, String>>();
     }
 
     public void readFile(String fileName) {
         dataLoader.readFile(fileName);
         dataFrame = dataLoader.getDataFrame();
+        columnNames = dataFrame.getColumnNames();
         for (int i = 0; i < dataFrame.getRowCount(); i++) {
-            patientSummaries.add(getPatientSummaryFromRowIndex(i));
+            patientInfos.add(getPatientInfoFromRowIndex(i));
         }
     }
 
-    private String getPatientSummaryFromRowIndex(int rowIndex) {
-        String id = dataFrame.getValue("ID", rowIndex);
-        String first = dataFrame.getValue("FIRST", rowIndex);
-        String last = dataFrame.getValue("LAST", rowIndex);
-        String birthday = dataFrame.getValue("BIRTHDATE", rowIndex);
-        String gender = dataFrame.getValue("GENDER", rowIndex);
-        return id + " " + first + " " + last + " " + birthday + " " + gender;
+    public List<String> getColumnNames() {
+        return columnNames;
     }
 
-    public List<String> searchFor(String keyword) {
-        if (keyword.length() == 0)
-            return List.of("Search keyword is empty. Please enter at least 1 character.");
+    private Map<String, String> getPatientInfoFromRowIndex(int rowIndex) {
+        HashMap<String, String> patientInfo = new HashMap<String, String>();
+        for (int i = 0; i < dataFrame.getColumnCount(); i++) {
+            String columnName = columnNames.get(i);
+            patientInfo.put(columnName, dataFrame.getValue(columnName, rowIndex));
+        }
+        return patientInfo;
+    }
 
-        String[] words = keyword.split("\\s");
-        ArrayList<String> searchResult = new ArrayList<String>();
+    public Map<String, String> getPatientInfo(String patientID) {
+        for (int i = 0; i < dataFrame.getRowCount(); i++) {
+            if (dataFrame.getValue("ID", i).equals(patientID)) {
+                return getPatientInfoFromRowIndex(i);
+            }
+        }
+        return null;
+    }
+
+    public List<Map<String, String>> getPatientInfos() {
+        return patientInfos;
+    }
+
+    public List<Map<String, String>> searchFor(String keyword) {
+        if (keyword.trim().length() == 0)
+            return List.of(Map.of("ERROR", "Search keyword is empty. Please enter at least 1 character."));
+
+        String[] words = keyword.split("\\s+");
+        ArrayList<Map<String, String>> searchResult = new ArrayList<Map<String, String>>();
         for (int row = 0; row < dataFrame.getRowCount(); row++) {
-            boolean keywordMatch = true;
+            boolean keywordMatch = true; // True iff every word is found
             for (String word : words) {
                 boolean wordFound = false;
                 for (int col = 0; col < dataFrame.getColumnCount(); col++) {
-                    String columnName = dataFrame.getColumnNames().get(col);
+                    String columnName = columnNames.get(col);
                     if (dataFrame.getValue(columnName, row).toLowerCase().contains(word.toLowerCase())) {
                         wordFound = true;
                         break;
@@ -58,7 +76,7 @@ public class Model {
                 }
             }
             if (keywordMatch) {
-                searchResult.add(getPatientSummaryFromRowIndex(row));
+                searchResult.add(getPatientInfoFromRowIndex(row));
             }
         }
         return searchResult;
