@@ -33,7 +33,7 @@
           for (Map<String, String> patient : patients)
           {
             String patientID = patient.get("ID");
-            String href = "patientInfo.jsp" + "?id=" + patientID;
+            String href = "patientInfo" + "?id=" + patientID;
       %>
             <tr>
               <% for (String columnName : columnNames)

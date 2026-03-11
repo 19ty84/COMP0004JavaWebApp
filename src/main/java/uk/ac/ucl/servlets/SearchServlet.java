@@ -79,10 +79,8 @@ public class SearchServlet extends HttpServlet {
         // This makes the 'result' list accessible to the JSP page.
         List<Map<String, String>> searchResult = model.searchFor(searchString);
         request.setAttribute("result", searchResult);
+        request.setAttribute("columnNames", model.getColumnNames());
       }
-
-      request.setAttribute("columnNames", model.getColumnNames());
-
       // 5. Forward the request to the JSP page for display.
       // RequestDispatcher.forward() is used to send the request/response objects to
       // another resource (JSP).
