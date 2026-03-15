@@ -1,15 +1,28 @@
-
 <html>
+
 <head>
   <title>Patient Data App</title>
 </head>
+
 <body>
-<div class="main">
-  <h1>Search</h1>
-  <form method="GET" action="/runsearch">
-    <input type="text" name="searchstring" placeholder="Enter search keyword here"/>
-    <input type="submit" value="Search"/>
-  </form>
-</div>
+  <div class="main">
+    <h1>Search</h1>
+    <form method="GET" action="/runsearch">
+      <input type="text" name="searchstring" placeholder="Enter search keyword here" />
+      <br>
+      <label for="order">Sort order:</label>
+      <select id="order" name="order">
+        <option value="default" selected>Default</option>
+        <option value="first">First Name (Ascending)</option>
+        <option value="firstdesc">First Name (Decending)</option>
+        <option value="last">Last Name (Ascending)</option>
+        <option value="lastdesc">Last Name (Decending)</option>
+        <option value="birthdate">Birth Date (Ascending)</option>
+        <option value="birthdatedesc">Birth Date (Decending)</option>
+      </select><br>
+      <input type="submit" value="Search" />
+    </form>
+  </div>
 </body>
+
 </html>

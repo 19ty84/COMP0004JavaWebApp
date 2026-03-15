@@ -63,6 +63,7 @@ public class SearchServlet extends HttpServlet {
     // The "searchstring" parameter name matches the 'name' attribute of the input
     // field in search.html.
     String searchString = request.getParameter("searchstring");
+    String order = request.getParameter("order");
 
     try {
       // 2. Get the singleton instance of the Model.
@@ -77,9 +78,20 @@ public class SearchServlet extends HttpServlet {
       } else {
         // 4. Perform the search and store the results in a request attribute.
         // This makes the 'result' list accessible to the JSP page.
-        List<Map<String, String>> searchResult = model.searchFor(searchString);
-        request.setAttribute("result", searchResult);
-        request.setAttribute("columnNames", model.getColumnNames());
+        List<Map<String, String>> searchResult = null;
+        if (order == null) {
+          searchResult = model.searchFor(searchString);
+        } else {
+          searchResult = model.searchFor(searchString, order);
+        }
+
+        if (searchResult != null) {
+          request.setAttribute("result", searchResult);
+          request.setAttribute("columnNames", model.getColumnNames());
+        } else {
+          request.setAttribute("errorMessage", "Error: List searchResult is null.");
+        }
+
       }
       // 5. Forward the request to the JSP page for display.
       // RequestDispatcher.forward() is used to send the request/response objects to

@@ -18,6 +18,19 @@
       <%= errorMessage %>
     </p>
     <% } %>
+    <form action="/patientList" method="GET">
+      <label for="order">Sort order:</label>
+      <select id="order" name="order">
+        <option value="default" selected>Default</option>
+        <option value="first">First Name (Ascending)</option>
+        <option value="firstdesc">First Name (Decending)</option>
+        <option value="last">Last Name (Ascending)</option>
+        <option value="lastdesc">Last Name (Decending)</option>
+        <option value="birthdate">Birth Date (Ascending)</option>
+        <option value="birthdatedesc">Birth Date (Decending)</option>
+      </select><br>
+      <input type="submit" value="Sort"/>
+    </form>
     <table border="1">
       <tr>
         <% List<String> columnNames = List.of("ID", "FIRST", "LAST", "BIRTHDATE", "GENDER");

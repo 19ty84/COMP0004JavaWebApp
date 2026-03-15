@@ -41,20 +41,29 @@ public class ViewPatientListServlet extends HttpServlet {
    *                          servlet handles the GET request
    */
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    String order = request.getParameter("order");
     try {
       // 1. Get the singleton instance of the Model.
       // The Model handles the actual data processing and data retrieval.
       Model model = ModelFactory.getModel();
 
       // 2. Retrieve the list of patient names from the model.
-      List<Map<String, String>> patientInfos = model.getPatientInfos();
+      List<Map<String, String>> patientInfos = null;
+      if (order == null) {
+        patientInfos = model.getPatientInfos();
+      } else {
+        patientInfos = model.getPatientInfos(order);
+      }
 
       // 3. Add the data to the request object.
       // This makes the 'patientSummaries' list accessible to the JSP page for
       // rendering.
-      request.setAttribute("patientInfos", patientInfos);
-
-      request.setAttribute("columnNames", model.getColumnNames());
+      if (patientInfos != null) {
+        request.setAttribute("patientInfos", patientInfos);
+        request.setAttribute("columnNames", model.getColumnNames());
+      } else {
+        request.setAttribute("errorMessage", "Error: List patientInfos is null.");
+      }
 
       // 4. Invoke the JSP for display.
       // RequestDispatcher.forward() is used to send the request/response objects to
