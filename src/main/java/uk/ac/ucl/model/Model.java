@@ -82,7 +82,7 @@ public class Model {
         return patientInfos;
     }
 
-    public List<Map<String, String>> searchFor(String keyword) {
+    public List<Map<String, String>> searchFor(String keyword, String order) {
         if (keyword.trim().length() == 0)
             return List.of(Map.of("ERROR", "Search keyword is empty. Please enter at least 1 character."));
 
@@ -109,14 +109,6 @@ public class Model {
                 searchResult.add(getPatientInfoFromRowIndex(row));
             }
         }
-        return searchResult;
-    }
-
-    public List<Map<String, String>> searchFor(String keyword, String order) {
-        if (keyword.trim().length() == 0)
-            return List.of(Map.of("ERROR", "Search keyword is empty. Please enter at least 1 character."));
-
-        List<Map<String, String>> searchResult = searchFor(keyword);
 
         if (order != null) {
             sortPatientList(searchResult, order);

@@ -1,6 +1,14 @@
-# WebAppExample
+# Java Web App
 
-A minimal Java web application intended for junior developers learning the basics of Java web apps, servlets, and JSPs. The app runs an embedded Tomcat server and serves static resources from `src/main/webapp`.
+This is a program of a web application for viewing patients information.
+
+## Features
+
+- Patient list: List all patients in the csv file.
+- Search: Use keywords to search for patients. If multiple keywords are entered, the program will find the patients that includes all the keywords.
+- Sort: In patient list and search page, the patient list can be sorted by a specified column in ascending or descending order.
+- Patient info page: In patient list and search page, Click the patient ID to view the specific information about a patient.
+- Statistics: View the statistics about patients.
 
 ## Prerequisites
 
@@ -51,8 +59,3 @@ Example (using environment variables):
 ```bash
 SERVER_PORT=9090 mvn clean compile exec:exec
 ```
-
-## Notes for Learners
-
-- The entry point is `uk.ac.ucl.main.Main` in `src/main/java/uk/ac/ucl/main/Main.java`.
-- Packaging as a WAR is useful if you want to deploy to an external Tomcat later.
