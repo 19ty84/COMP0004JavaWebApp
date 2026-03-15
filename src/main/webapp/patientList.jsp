@@ -22,19 +22,19 @@
       <label for="order">Sort order:</label>
       <select id="order" name="order">
         <option value="default" selected>Default</option>
-        <option value="first">First Name (Ascending)</option>
-        <option value="firstdesc">First Name (Decending)</option>
-        <option value="last">Last Name (Ascending)</option>
-        <option value="lastdesc">Last Name (Decending)</option>
-        <option value="birthdate">Birth Date (Ascending)</option>
-        <option value="birthdatedesc">Birth Date (Decending)</option>
+        <% List<String> columnNames  = (List<String>) request.getAttribute("columnNames");
+        for(String columnName : columnNames){ %>
+          <option value=<%= columnName %>><%= columnName %> (Ascending)</option>
+          <option value=<%= (columnName + "_desc") %>><%= columnName %> (Descending)</option>
+        <% } %>
       </select><br>
       <input type="submit" value="Sort"/>
     </form>
+    <p>Found <%= request.getAttribute("count") %> patients</p>
     <table border="1">
       <tr>
-        <% List<String> columnNames = List.of("ID", "FIRST", "LAST", "BIRTHDATE", "GENDER");
-        for (String columnName : columnNames)
+        <% List<String> summaryColumnNames = List.of("ID", "FIRST", "LAST", "BIRTHDATE", "GENDER");
+        for (String columnName : summaryColumnNames)
         {
         %>
           <td><%= columnName %></td>
@@ -49,7 +49,7 @@
             String href = "patientInfo" + "?id=" + patientID;
       %>
             <tr>
-              <% for (String columnName : columnNames)
+              <% for (String columnName : summaryColumnNames)
               {
                 if (columnName.equals("ID")){
                 %>

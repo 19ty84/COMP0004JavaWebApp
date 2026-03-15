@@ -11,10 +11,10 @@ import uk.ac.ucl.model.Model;
 import uk.ac.ucl.model.ModelFactory;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
-@WebServlet("/patientInfo")
-public class ViewPatientInfoServlet extends HttpServlet {
+@WebServlet("/statistics")
+public class ViewStatisticsPageServlet extends HttpServlet {
     /**
      * Handles HTTP GET requests.
      *
@@ -29,18 +29,11 @@ public class ViewPatientInfoServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
             Model model = ModelFactory.getModel();
-            request.setAttribute("columnNames", model.getColumnNames());
-            String patientID = request.getParameter("id");
-            Map<String, String> patientInfo = model.getPatientInfo(patientID);
-
-            if (patientInfo == null) {
-                request.setAttribute("errorMessage", "Patient not found.");
-            } else {
-                request.setAttribute("patientInfo", patientInfo);
-            }
+            List<String> columnNames = model.getColumnNames();
+            request.setAttribute("columnNames", columnNames);
 
             ServletContext context = getServletContext();
-            RequestDispatcher dispatch = context.getRequestDispatcher("/patientInfo.jsp");
+            RequestDispatcher dispatch = context.getRequestDispatcher("/statistics.jsp");
             dispatch.forward(request, response);
         } catch (IOException e) {
             request.setAttribute("errorMessage", "Error loading data: " + e.getMessage());

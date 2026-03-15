@@ -63,12 +63,14 @@ public class SearchServlet extends HttpServlet {
     // The "searchstring" parameter name matches the 'name' attribute of the input
     // field in search.html.
     String searchString = request.getParameter("searchstring");
+    request.setAttribute("searchstring", searchString);
     String order = request.getParameter("order");
 
     try {
       // 2. Get the singleton instance of the Model.
       // The Model handles the actual data processing and search logic.
       Model model = ModelFactory.getModel();
+      request.setAttribute("columnNames", model.getColumnNames());
 
       // 3. Basic validation of search input.
       if (searchString == null || searchString.trim().isEmpty()) {
@@ -80,14 +82,13 @@ public class SearchServlet extends HttpServlet {
         // This makes the 'result' list accessible to the JSP page.
         List<Map<String, String>> searchResult = null;
         if (order == null) {
-          searchResult = model.searchFor(searchString);
+          searchResult = model.searchFor(searchString, "default");
         } else {
           searchResult = model.searchFor(searchString, order);
         }
-
         if (searchResult != null) {
           request.setAttribute("result", searchResult);
-          request.setAttribute("columnNames", model.getColumnNames());
+          request.setAttribute("count", searchResult.size());
         } else {
           request.setAttribute("errorMessage", "Error: List searchResult is null.");
         }

@@ -14,20 +14,32 @@
     <%
       String errorMessage = (String) request.getAttribute("errorMessage");
       if (errorMessage != null)
-      {
-    %>
-        <p style="color: red;"><%= errorMessage %></p>
-    <%
-      }
-      List<Map<String, String>> patients = (List<Map<String, String>>) request.getAttribute("result");
-        if (patients != null && patients.size() != 0)
       { %>
+        <p style="color: red;"><%= errorMessage %></p>
+      <% }
+      List<String> columnNames  = (List<String>) request.getAttribute("columnNames"); %>
+      <form method="GET" action="/runsearch">
+      <input type="text" name="searchstring" value="<%= (String)request.getAttribute("searchstring") %>" />
+      <br>
+      <label for="order">Sort order:</label>
+      <select id="order" name="order">
+        <option value="default" selected>Default</option>
+        <% for(String columnName : columnNames){ %>
+          <option value="<%= columnName %>"><%= columnName %> (Ascending)</option>
+          <option value="<%= (columnName + "_desc") %>"><%= columnName %> (Descending)</option>
+        <% } %>
+      </select><br>
+      <input type="submit" value="Search" />
+    </form>
+      <%
+      List<Map<String, String>> patients = (List<Map<String, String>>) request.getAttribute("result");
+      if (patients != null && patients.size() != 0)
+      { %>
+        <p>Found <%= request.getAttribute("count") %> patients</p>
         <table border="1">
         <tr>
-          <% List<String> columnNames = (List<String>) request.getAttribute("columnNames");
-          for (String columnName : columnNames)
-          {
-          %>
+          <% for (String columnName : columnNames)
+          { %>
             <td><%= columnName %></td>
           <% } %>
         </tr>

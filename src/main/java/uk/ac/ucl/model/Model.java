@@ -6,21 +6,17 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.directory.SearchResult;
-
 public class Model {
     private DataLoader dataLoader;
     private DataFrame dataFrame;
     private ArrayList<String> columnNames;
     private ArrayList<Map<String, String>> patientInfos;
-    private ArrayList<Map<String, String>> sortedPatientInfos;
 
     public Model() {
         dataLoader = new DataLoader();
         dataFrame = null;
         columnNames = new ArrayList<String>();
         patientInfos = new ArrayList<Map<String, String>>();
-        sortedPatientInfos = new ArrayList<Map<String, String>>();
     }
 
     public void readFile(String fileName) {
@@ -29,7 +25,6 @@ public class Model {
         columnNames = dataFrame.getColumnNames();
         for (int i = 0; i < dataFrame.getRowCount(); i++) {
             patientInfos.add(getPatientInfoFromRowIndex(i));
-            sortedPatientInfos.add(patientInfos.get(i));
         }
     }
 
@@ -39,6 +34,7 @@ public class Model {
 
     private Map<String, String> getPatientInfoFromRowIndex(int rowIndex) {
         HashMap<String, String> patientInfo = new HashMap<String, String>();
+        patientInfo.put("ROWINDEX", String.format("%09d", rowIndex));
         for (int i = 0; i < dataFrame.getColumnCount(); i++) {
             String columnName = columnNames.get(i);
             patientInfo.put(columnName, dataFrame.getValue(columnName, rowIndex));
@@ -66,55 +62,31 @@ public class Model {
     }
 
     private void sortPatientList(List<Map<String, String>> patientList, String order) {
-        switch (order.toLowerCase()) {
-            case "default":
-                return;
+        String key;
+        boolean isDesc = order.contains("desc");
+        if (isDesc)
+            key = order.toUpperCase().split("_")[0];
+        else
+            key = order.toUpperCase();
 
-            case "first":
-                sortStringMapList(patientList, "FIRST", false);
-                return;
-
-            case "firstdesc":
-                sortStringMapList(patientList, "FIRST", true);
-                return;
-
-            case "last":
-                sortStringMapList(patientList, "LAST", false);
-                return;
-
-            case "lastdesc":
-                sortStringMapList(patientList, "LAST", true);
-                return;
-
-            case "birthdate":
-                sortStringMapList(patientList, "BIRTHDATE", false);
-                return;
-
-            case "birthdatedesc":
-                sortStringMapList(patientList, "BIRTHDATE", true);
-                return;
-
-            default:
-                return;
-        }
-    }
-
-    public List<Map<String, String>> getPatientInfos() {
-        return patientInfos;
+        if (key.equals("DEFAULT"))
+            sortStringMapList(patientList, "ROWINDEX", isDesc);
+        else
+            sortStringMapList(patientList, key, isDesc);
     }
 
     public List<Map<String, String>> getPatientInfos(String order) {
-        if (order == null || order.toLowerCase().equals("default")) {
-            return patientInfos;
+        if (order != null) {
+            sortPatientList(patientInfos, order);
         }
-        sortPatientList(sortedPatientInfos, order);
-        return sortedPatientInfos;
+        return patientInfos;
     }
 
     public List<Map<String, String>> searchFor(String keyword) {
         if (keyword.trim().length() == 0)
             return List.of(Map.of("ERROR", "Search keyword is empty. Please enter at least 1 character."));
 
+        // Find rows that contains every word in keyword
         String[] words = keyword.split("\\s+");
         ArrayList<Map<String, String>> searchResult = new ArrayList<Map<String, String>>();
         for (int row = 0; row < dataFrame.getRowCount(); row++) {
@@ -146,10 +118,22 @@ public class Model {
 
         List<Map<String, String>> searchResult = searchFor(keyword);
 
-        if (order == null || order.toLowerCase().equals("default")) {
-            return searchResult;
+        if (order != null) {
+            sortPatientList(searchResult, order);
         }
-        sortPatientList(searchResult, order);
         return searchResult;
+    }
+
+    public Map<String, Integer> getColumnStatistics(String columnName) {
+        Map<String, Integer> columnStatistics = new HashMap<String, Integer>();
+        for (int row = 0; row < dataFrame.getRowCount(); row++) {
+            String key = dataFrame.getValue(columnName, row);
+            if (!columnStatistics.containsKey(key)) {
+                columnStatistics.put(key, 1);
+            } else {
+                columnStatistics.put(key, columnStatistics.get(key) + 1);
+            }
+        }
+        return columnStatistics;
     }
 }

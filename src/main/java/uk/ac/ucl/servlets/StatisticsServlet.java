@@ -13,8 +13,8 @@ import uk.ac.ucl.model.ModelFactory;
 import java.io.IOException;
 import java.util.Map;
 
-@WebServlet("/patientInfo")
-public class ViewPatientInfoServlet extends HttpServlet {
+@WebServlet("/statisticsResult")
+public class StatisticsServlet extends HttpServlet {
     /**
      * Handles HTTP GET requests.
      *
@@ -27,20 +27,20 @@ public class ViewPatientInfoServlet extends HttpServlet {
      *                          servlet handles the GET request
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String column = request.getParameter("column");
         try {
             Model model = ModelFactory.getModel();
             request.setAttribute("columnNames", model.getColumnNames());
-            String patientID = request.getParameter("id");
-            Map<String, String> patientInfo = model.getPatientInfo(patientID);
 
-            if (patientInfo == null) {
-                request.setAttribute("errorMessage", "Patient not found.");
+            if (column != null) {
+                Map<String, Integer> columnStatistics = model.getColumnStatistics(column);
+                request.setAttribute("columnStatistics", columnStatistics);
             } else {
-                request.setAttribute("patientInfo", patientInfo);
+                request.setAttribute("errorMessage", "Error: Parameter column is null.");
             }
 
             ServletContext context = getServletContext();
-            RequestDispatcher dispatch = context.getRequestDispatcher("/patientInfo.jsp");
+            RequestDispatcher dispatch = context.getRequestDispatcher("/statisticsResult.jsp");
             dispatch.forward(request, response);
         } catch (IOException e) {
             request.setAttribute("errorMessage", "Error loading data: " + e.getMessage());

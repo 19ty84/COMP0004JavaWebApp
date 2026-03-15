@@ -46,11 +46,12 @@ public class ViewPatientListServlet extends HttpServlet {
       // 1. Get the singleton instance of the Model.
       // The Model handles the actual data processing and data retrieval.
       Model model = ModelFactory.getModel();
+      request.setAttribute("columnNames", model.getColumnNames());
 
       // 2. Retrieve the list of patient names from the model.
       List<Map<String, String>> patientInfos = null;
       if (order == null) {
-        patientInfos = model.getPatientInfos();
+        patientInfos = model.getPatientInfos("default");
       } else {
         patientInfos = model.getPatientInfos(order);
       }
@@ -60,7 +61,7 @@ public class ViewPatientListServlet extends HttpServlet {
       // rendering.
       if (patientInfos != null) {
         request.setAttribute("patientInfos", patientInfos);
-        request.setAttribute("columnNames", model.getColumnNames());
+        request.setAttribute("count", patientInfos.size());
       } else {
         request.setAttribute("errorMessage", "Error: List patientInfos is null.");
       }
